@@ -9,7 +9,6 @@ import SwiftUI
 
 struct SplashView: View {
     @StateObject private var viewModel: SplashViewModel
-    
     init(coordinator: AppCoordinator) {
         self._viewModel = StateObject(wrappedValue: SplashViewModel(coordinator: coordinator))
     }
@@ -27,7 +26,7 @@ struct SplashView: View {
                 Image(systemName: "magnifyingglass.circle.fill")
                     .font(.system(size: 100))
                     .foregroundColor(.white)
-                    .scaleEffect(viewModel.isLoading ? 1.0 : 1.2)
+                    .scaleEffect(viewModel.isLoading ? 1.5 : 1.2)
                     .animation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true), value: viewModel.isLoading)
                 
                 Text("RepoExplorer")
