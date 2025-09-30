@@ -98,17 +98,37 @@ struct RepositoryListView: View {
                 .font(.system(size: 60))
                 .foregroundColor(.secondary)
             
-            Text("No repositories found")
-                .font(.title2)
-                .fontWeight(.semibold)
-            
-            Text("Try searching for a different term or browse Google's repositories")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-            
-            if !viewModel.searchText.isEmpty {
+            if viewModel.searchText.isEmpty {
+                Text("Search for repositories")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                
+                Text("Use the search bar above to find repositories on GitHub")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            } else if viewModel.isLoading {
+                Text("Searching...")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                
+                Text("Finding repositories for \"\(viewModel.searchText)\"")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            } else {
+                Text("No repositories found")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                
+                Text("Try searching for a different term")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                
                 Button("Clear Search") {
                     viewModel.clearSearch()
                 }
@@ -152,9 +172,7 @@ struct RepositoryListView: View {
             }
             .listStyle(PlainListStyle())
             .refreshable {
-                if viewModel.searchText.isEmpty {
-                    viewModel.loadInitialRepositories()
-                } else {
+                if !viewModel.searchText.isEmpty {
                     viewModel.searchRepositories()
                 }
             }

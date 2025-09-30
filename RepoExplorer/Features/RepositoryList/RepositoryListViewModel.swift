@@ -31,13 +31,12 @@ class RepositoryListViewModel: ObservableObject {
         self.searchUseCase = searchUseCase
         self.getGoogleRepositoriesUseCase = getGoogleRepositoriesUseCase
         setupSearchSubscription()
-        loadInitialRepositories()
     }
     
     // MARK: - Public Methods
     func searchRepositories() {
         guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            loadInitialRepositories()
+            repositories = []
             return
         }
         
@@ -80,7 +79,7 @@ class RepositoryListViewModel: ObservableObject {
     
     func clearSearch() {
         searchText = ""
-        loadInitialRepositories()
+        repositories = []
     }
     
     // MARK: - Private Methods
