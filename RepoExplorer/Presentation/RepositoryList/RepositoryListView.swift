@@ -210,16 +210,6 @@ struct RepositoryRowView: View {
             
             Spacer()
             
-            if let language = repository.language {
-                Text(language)
-                    .font(.caption)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.blue.opacity(0.1))
-                    .foregroundColor(.blue)
-                    .cornerRadius(8)
-            }
-            
             Image(systemName: "chevron.right")
                 .foregroundColor(.secondary)
                 .font(.caption)

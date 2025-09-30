@@ -41,16 +41,6 @@ struct RepositoryDetailView: View {
                     Text("Created \(formatCreationDate(repository.createdAt))")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                    
-                    if let language = repository.language {
-                        Text(language)
-                            .font(.caption)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.blue.opacity(0.1))
-                            .foregroundColor(.blue)
-                            .cornerRadius(12)
-                    }
                 }
                 
                 VStack(spacing: 8) {
