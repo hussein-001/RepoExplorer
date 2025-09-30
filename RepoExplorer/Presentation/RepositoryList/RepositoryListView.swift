@@ -25,10 +25,8 @@ struct RepositoryListView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Search Bar
                 searchBar
                 
-                // Content
                 if viewModel.isLoading && viewModel.repositories.isEmpty {
                     loadingView
                 } else if viewModel.repositories.isEmpty {
@@ -40,9 +38,11 @@ struct RepositoryListView: View {
             .navigationTitle("Repositories")
             .navigationBarTitleDisplayMode(.large)
             .alert("Error", isPresented: $viewModel.showingError) {
-                Button("OK") { }
+                Button("OK") { 
+                    viewModel.showingError = false
+                }
             } message: {
-                Text(viewModel.errorMessage ?? "An unknown error occurred")
+                Text(viewModel.errorMessage ?? "An unexpected error occurred")
             }
             .sheet(item: $selectedRepository) { repository in
                 RepositoryDetailView(repository: repository)
@@ -50,7 +50,6 @@ struct RepositoryListView: View {
         }
     }
     
-    // MARK: - Search Bar
     private var searchBar: some View {
         HStack {
             HStack {
@@ -78,7 +77,6 @@ struct RepositoryListView: View {
         .padding(.top, 8)
     }
     
-    // MARK: - Loading View
     private var loadingView: some View {
         VStack(spacing: 16) {
             ProgressView()
@@ -91,7 +89,6 @@ struct RepositoryListView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
-    // MARK: - Empty State View
     private var emptyStateView: some View {
         VStack(spacing: 20) {
             Image(systemName: "magnifyingglass")
@@ -138,7 +135,6 @@ struct RepositoryListView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
-    // MARK: - Repository List View
     private var repositoryListView: some View {
         VStack(spacing: 0) {
             // Results count
@@ -159,7 +155,6 @@ struct RepositoryListView: View {
                 .padding(.vertical, 8)
             }
             
-            // Repository list
             List {
                 ForEach(viewModel.repositories) { repository in
                     RepositoryRowView(repository: repository)
@@ -180,7 +175,6 @@ struct RepositoryListView: View {
     }
 }
 
-// MARK: - Repository Row View
 struct RepositoryRowView: View {
     let repository: Repository
     
@@ -203,15 +197,12 @@ struct RepositoryRowView: View {
             .frame(width: 50, height: 50)
             .clipShape(Circle())
             
-            // Repository Info
             VStack(alignment: .leading, spacing: 4) {
-                // Repository Name
                 Text(repository.name)
                     .font(.headline)
                     .foregroundColor(.primary)
                     .lineLimit(1)
                 
-                // Creation Date
                 Text("Created \(formatCreationDate(repository.createdAt))")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
@@ -219,7 +210,6 @@ struct RepositoryRowView: View {
             
             Spacer()
             
-            // Language Badge (if available)
             if let language = repository.language {
                 Text(language)
                     .font(.caption)
@@ -230,7 +220,6 @@ struct RepositoryRowView: View {
                     .cornerRadius(8)
             }
             
-            // Chevron indicator
             Image(systemName: "chevron.right")
                 .foregroundColor(.secondary)
                 .font(.caption)
@@ -239,17 +228,14 @@ struct RepositoryRowView: View {
         .contentShape(Rectangle())
     }
     
-    private func formatCreationDate(_ dateString: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
-        
-        if let date = formatter.date(from: dateString) {
-            let displayFormatter = DateFormatter()
-            displayFormatter.dateStyle = .medium
-            return displayFormatter.string(from: date)
+    private func formatCreationDate(_ date: Date?) -> String {
+        guard let date = date else {
+            return "Unknown"
         }
         
-        return dateString
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateStyle = .medium
+        return displayFormatter.string(from: date)
     }
 }
 

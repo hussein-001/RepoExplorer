@@ -60,7 +60,7 @@ The project follows **Clean Architecture** with proper separation of concerns:
 - **Coordinator Pattern** for clean navigation management
 - **Protocol-based design** for testability and dependency injection
 - **Real-time search** with debouncing for optimal performance
-- **Error handling** with user-friendly messages
+- **Comprehensive error handling** with domain-specific error types and user-friendly messages
 - **Loading states** with progress indicators
 - **AsyncImage** for efficient avatar loading with placeholder
 - **Modal navigation** for detailed views
@@ -72,16 +72,22 @@ RepoExplorer/
 ├── Domain/
 │   ├── Entities/
 │   │   └── Repository.swift                    # Repository data models
-│   ├── UseCases/
-│   │   └── SearchRepositoriesUseCase.swift     # Business logic
-│   └── Repositories/
-│       └── RepositoryRepositoryProtocol.swift  # Repository interface
+│   ├── Errors/
+│   │   ├── RepositoryError.swift               # Domain-specific error types
+│   │   └── ErrorMapper.swift                   # Error mapping utilities
+│   ├── Infrastructure/
+│   │   └── RepositoryRepositoryProtocol.swift  # Repository interface
+│   └── UseCases/
+│       └── SearchRepositoriesUseCase.swift     # Business logic
 ├── Data/
-│   ├── Network/
-│   │   └── GitHubAPIService.swift             # GitHub API integration
-│   └── Repositories/
+│   ├── DataSource/
+│   │   ├── RepositoryDataSourceProtocol.swift # Data source interface
+│   │   └── GitHubAPIService.swift             # GitHub API service
+│   ├── DataMapping/
+│   │   └── RepositoryDataMapper.swift         # API response mapping
+│   └── Repository/
 │       └── RepositoryRepository.swift         # Repository implementation
-├── Features/
+├── Presentation/
 │   ├── Splash/
 │   │   ├── SplashView.swift                   # Splash screen UI
 │   │   └── SplashViewModel.swift              # Splash screen logic
@@ -95,6 +101,56 @@ RepoExplorer/
 ├── RepoExplorerApp.swift                      # Main app entry point
 └── ContentView.swift                          # Default SwiftUI view
 ```
+
+## Error Handling Architecture
+
+The app implements a comprehensive error handling system following Clean Architecture principles:
+
+### Domain Layer
+- **`RepositoryError`**: Domain-specific error types with user-friendly messages
+- **`ErrorMapper`**: Maps data layer errors to domain errors
+- **Error Types**: Network, validation, server, rate limiting, and unknown errors
+
+### Data Layer
+- **`GitHubAPIError`**: API-specific errors
+- **`HTTPError`**: HTTP status code errors
+- **Error Mapping**: Converts network/API errors to domain errors
+
+### Presentation Layer
+- **User-Friendly Messages**: Clear, actionable error descriptions
+- **Recovery Suggestions**: Helpful guidance for users
+- **Error States**: Proper handling of loading and error states
+
+### Error Flow
+1. **Network/API errors** → **Data layer mapping** → **Domain errors** → **User-friendly messages**
+2. **Validation errors** → **Domain layer** → **Immediate user feedback**
+3. **All errors** include `errorDescription`, `failureReason`, and `recoverySuggestion`
+
+## Data Layer Architecture
+
+The Data layer follows Clean Architecture principles with clear separation of concerns:
+
+### DataSource Layer
+- **`RepositoryDataSourceProtocol`**: Defines data source operations
+- **`GitHubAPIService`**: Implements GitHub API integration
+- **HTTP handling**: Status codes, error mapping, network requests
+
+### DataMapping Layer
+- **`RepositoryDataMapper`**: Maps API responses to domain entities
+- **API Models**: `GitHubRepositoryResponse`, `GitHubSearchRepositoriesResponse`
+- **Date parsing**: ISO 8601 format handling with fallbacks
+- **Type conversion**: API strings to domain Date objects
+
+### Repository Layer
+- **`RepositoryRepository`**: Implements domain repository protocols
+- **Data transformation**: Maps data source responses to domain models
+- **Error mapping**: Converts data layer errors to domain errors
+- **Abstraction**: Hides data source implementation details
+
+### Data Flow
+1. **API Response** → **Data Mapping** → **Domain Entity** → **Use Case** → **Presentation**
+2. **Error handling** at each layer with proper mapping
+3. **Type safety** with proper Swift types (Date vs String)
 
 ## Repository Detail Features
 

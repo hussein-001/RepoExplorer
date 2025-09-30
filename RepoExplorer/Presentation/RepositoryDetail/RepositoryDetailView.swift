@@ -31,21 +31,17 @@ struct RepositoryDetailView: View {
                 .frame(width: 100, height: 100)
                 .clipShape(Circle())
                 
-                // Repository Information
                 VStack(spacing: 12) {
-                    // Repository Name
                     Text(repository.name)
                         .font(.title)
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
                         .multilineTextAlignment(.center)
                     
-                    // Creation Date
                     Text("Created \(formatCreationDate(repository.createdAt))")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                     
-                    // Language Badge (if available)
                     if let language = repository.language {
                         Text(language)
                             .font(.caption)
@@ -57,7 +53,6 @@ struct RepositoryDetailView: View {
                     }
                 }
                 
-                // Stargazers Count
                 VStack(spacing: 8) {
                     HStack {
                         Image(systemName: "star.fill")
@@ -93,18 +88,14 @@ struct RepositoryDetailView: View {
         }
     }
     
-    // MARK: - Helper Methods
-    private func formatCreationDate(_ dateString: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
-        
-        if let date = formatter.date(from: dateString) {
-            let displayFormatter = DateFormatter()
-            displayFormatter.dateStyle = .medium
-            return displayFormatter.string(from: date)
+    private func formatCreationDate(_ date: Date?) -> String {
+        guard let date = date else {
+            return "Unknown"
         }
         
-        return dateString
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateStyle = .medium
+        return displayFormatter.string(from: date)
     }
 }
 
@@ -118,9 +109,9 @@ struct RepositoryDetailView: View {
         language: "Swift",
         stargazersCount: 1234,
         forksCount: 567,
-        createdAt: "2023-01-01T00:00:00Z",
-        updatedAt: "2023-12-01T00:00:00Z",
-        owner: RepositoryOwner(
+        createdAt: Date(),
+        updatedAt: Date(),
+        owner: Owner(
             id: 1,
             login: "google",
             avatarUrl: "https://github.com/google.png",

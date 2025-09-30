@@ -10,20 +10,17 @@ import Combine
 
 @MainActor
 class RepositoryListViewModel: ObservableObject {
-    // MARK: - Published Properties
     @Published var searchText: String = ""
     @Published var repositories: [Repository] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var showingError: Bool = false
     
-    // MARK: - Private Properties
     private let searchUseCase: SearchRepositoriesUseCaseProtocol
     private let getGoogleRepositoriesUseCase: GetGoogleRepositoriesUseCaseProtocol
     private var cancellables = Set<AnyCancellable>()
     private let searchDebounceTime: TimeInterval = 0.5
     
-    // MARK: - Initialization
     init(
         searchUseCase: SearchRepositoriesUseCaseProtocol,
         getGoogleRepositoriesUseCase: GetGoogleRepositoriesUseCaseProtocol
@@ -33,7 +30,6 @@ class RepositoryListViewModel: ObservableObject {
         setupSearchSubscription()
     }
     
-    // MARK: - Public Methods
     func searchRepositories() {
         guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             repositories = []
@@ -82,7 +78,6 @@ class RepositoryListViewModel: ObservableObject {
         repositories = []
     }
     
-    // MARK: - Private Methods
     private func setupSearchSubscription() {
         $searchText
             .debounce(for: .seconds(searchDebounceTime), scheduler: RunLoop.main)
@@ -93,8 +88,8 @@ class RepositoryListViewModel: ObservableObject {
             .store(in: &cancellables)
     }
     
-    private func handleError(_ error: Error) {
-        errorMessage = error.localizedDescription
+    private func handleError(_ error: RepositoryError) {
+        errorMessage = error.errorDescription
         showingError = true
     }
 }

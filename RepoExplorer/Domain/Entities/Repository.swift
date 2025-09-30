@@ -16,9 +16,9 @@ struct Repository: Identifiable, Codable, Equatable {
     let language: String?
     let stargazersCount: Int
     let forksCount: Int
-    let createdAt: String
-    let updatedAt: String
-    let owner: RepositoryOwner
+    let createdAt: Date?
+    let updatedAt: Date?
+    let owner: Owner
     
     enum CodingKeys: String, CodingKey {
         case id, name, description, language, owner
@@ -31,7 +31,7 @@ struct Repository: Identifiable, Codable, Equatable {
     }
 }
 
-struct RepositoryOwner: Codable, Equatable {
+struct Owner: Codable, Equatable {
     let id: Int
     let login: String
     let avatarUrl: String

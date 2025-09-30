@@ -8,12 +8,7 @@
 import Foundation
 import Combine
 
-protocol GitHubAPIServiceProtocol {
-    func searchRepositories(query: String, page: Int, perPage: Int) -> AnyPublisher<SearchRepositoriesResponse, Error>
-    func getGoogleRepositories(page: Int, perPage: Int) -> AnyPublisher<[Repository], Error>
-}
-
-class GitHubAPIService: GitHubAPIServiceProtocol {
+class GitHubAPIService: RepositoryDataSourceProtocol {
     private let session: URLSession
     private let baseURL = "https://api.github.com"
     
@@ -21,28 +16,42 @@ class GitHubAPIService: GitHubAPIServiceProtocol {
         self.session = session
     }
     
-    func searchRepositories(query: String, page: Int, perPage: Int) -> AnyPublisher<SearchRepositoriesResponse, Error> {
+    func searchRepositories(query: String, page: Int, perPage: Int) -> AnyPublisher<GitHubSearchRepositoriesResponse, Error> {
         guard let url = buildSearchURL(query: query, page: page, perPage: perPage) else {
             return Fail(error: GitHubAPIError.invalidURL)
                 .eraseToAnyPublisher()
         }
         
         return session.dataTaskPublisher(for: url)
-            .map(\.data)
-            .decode(type: SearchRepositoriesResponse.self, decoder: JSONDecoder())
+            .tryMap { data, response in
+                if let httpResponse = response as? HTTPURLResponse {
+                    if httpResponse.statusCode != 200 {
+                        throw HTTPError(statusCode: httpResponse.statusCode)
+                    }
+                }
+                return data
+            }
+            .decode(type: GitHubSearchRepositoriesResponse.self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
     
-    func getGoogleRepositories(page: Int, perPage: Int) -> AnyPublisher<[Repository], Error> {
+    func getGoogleRepositories(page: Int, perPage: Int) -> AnyPublisher<[GitHubRepositoryResponse], Error> {
         guard let url = buildGoogleRepositoriesURL(page: page, perPage: perPage) else {
             return Fail(error: GitHubAPIError.invalidURL)
                 .eraseToAnyPublisher()
         }
         
         return session.dataTaskPublisher(for: url)
-            .map(\.data)
-            .decode(type: [Repository].self, decoder: JSONDecoder())
+            .tryMap { data, response in
+                if let httpResponse = response as? HTTPURLResponse {
+                    if httpResponse.statusCode != 200 {
+                        throw HTTPError(statusCode: httpResponse.statusCode)
+                    }
+                }
+                return data
+            }
+            .decode(type: [GitHubRepositoryResponse].self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
